@@ -244,6 +244,7 @@ impl Compiler {
             Arc::new(plugins::copy::CopyPlugin {}),
             Arc::new(plugins::import::ImportPlugin {}),
             // file types
+            Arc::new(plugins::case_sensitive::CaseSensitivePlugin::new()),
             Arc::new(plugins::context_module::ContextModulePlugin {}),
             Arc::new(plugins::runtime::MakoRuntime {}),
             Arc::new(plugins::invalid_webpack_syntax::InvalidWebpackSyntaxPlugin {}),
@@ -296,6 +297,10 @@ impl Compiler {
 
         if args.watch && std::env::var("SSU").is_ok_and(|v| v == "true") {
             plugins.push(Arc::new(plugins::ssu::SUPlus::new()));
+        }
+
+        if args.watch && config.experimental.central_ensure {
+            plugins.push(Arc::new(plugins::central_ensure::CentralChunkEnsure {}));
         }
 
         if let Some(minifish_config) = &config._minifish {
